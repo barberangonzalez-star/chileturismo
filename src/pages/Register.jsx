@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import NavBar from '../components/NavBar.jsx'
+import { supabase } from '../lib/supabaseClient.js'
 
 const REGIONES = [
   'Valparaíso',
@@ -26,17 +27,41 @@ export default function Register() {
     rubro: RUBROS[0],
     region: REGIONES[0],
     email: '',
+    password: '',
     whatsapp: '',
     plan: 'Profesional',
   })
   const [enviado, setEnviado] = useState(false)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }))
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
+    setError('')
+    setLoading(true)
+    const { error } = await supabase.auth.signUp({
+      email: form.email,
+      password: form.password,
+      options: {
+        data: {
+          nombre: form.nombre,
+          empresa: form.empresa,
+          rubro: form.rubro,
+          region: form.region,
+          whatsapp: form.whatsapp,
+          plan: form.plan,
+        },
+      },
+    })
+    setLoading(false)
+    if (error) {
+      setError(error.message)
+      return
+    }
     setEnviado(true)
   }
 
@@ -79,13 +104,14 @@ export default function Register() {
               </div>
               <h2 className="font-display font-bold text-2xl mt-5 text-ink-900">¡Cuenta creada!</h2>
               <p className="mt-2 text-ink-600 text-sm max-w-xs mx-auto">
-                Bienvenido/a, {form.nombre.split(' ')[0] || 'operador'}. Te llevamos a tu panel de demostración.
+                Bienvenido/a, {form.nombre.split(' ')[0] || 'operador'}. Revisa tu correo para
+                confirmar tu cuenta y luego inicia sesión para entrar a tu panel.
               </p>
               <button
-                onClick={() => navigate('/demo')}
+                onClick={() => navigate('/login')}
                 className="focus-ring mt-6 bg-coral-500 hover:bg-coral-600 text-white font-semibold px-6 py-2.5 rounded-full transition-colors"
               >
-                Ir a mi panel
+                Ir a iniciar sesión
               </button>
             </div>
           ) : (
@@ -158,6 +184,18 @@ export default function Register() {
                 />
               </Field>
 
+              <Field label="Contraseña">
+                <input
+                  required
+                  type="password"
+                  minLength={6}
+                  value={form.password}
+                  onChange={(e) => update('password', e.target.value)}
+                  className="focus-ring w-full rounded-xl border border-ink-900/10 px-3.5 py-2.5 text-sm outline-none"
+                  placeholder="Mínimo 6 caracteres"
+                />
+              </Field>
+
               <Field label="Plan">
                 <div className="grid grid-cols-3 gap-2">
                   {['Básico', 'Profesional', 'Premium'].map((p) => (
@@ -177,16 +215,21 @@ export default function Register() {
                 </div>
               </Field>
 
+              {error && (
+                <p className="text-sm text-coral-600 bg-coral-50 rounded-xl px-3.5 py-2.5">{error}</p>
+              )}
+
               <button
                 type="submit"
-                className="focus-ring w-full bg-coral-500 hover:bg-coral-600 text-white font-semibold py-3 rounded-full transition-colors mt-2"
+                disabled={loading}
+                className="focus-ring w-full bg-coral-500 hover:bg-coral-600 disabled:opacity-60 text-white font-semibold py-3 rounded-full transition-colors mt-2"
               >
-                Crear cuenta
+                {loading ? 'Creando cuenta…' : 'Crear cuenta'}
               </button>
               <p className="text-xs text-ink-400 text-center">
                 Ya tienes cuenta?{' '}
-                <Link to="/demo" className="text-teal-600 font-semibold hover:underline">
-                  Entrar al panel
+                <Link to="/login" className="text-teal-600 font-semibold hover:underline">
+                  Iniciar sesión
                 </Link>
               </p>
             </form>

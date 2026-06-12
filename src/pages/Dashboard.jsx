@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo.jsx'
+import { supabase } from '../lib/supabaseClient.js'
 
 const TABS = [
   { id: 'reservas', label: 'Reservas', icon: '📅' },
@@ -31,6 +32,12 @@ const POSTS = [
 
 export default function Dashboard() {
   const [tab, setTab] = useState('reservas')
+  const navigate = useNavigate()
+
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    navigate('/login')
+  }
 
   return (
     <div className="min-h-screen bg-[#FBF9F5] flex">
@@ -68,9 +75,17 @@ export default function Dashboard() {
           <h1 className="font-display font-semibold text-lg text-ink-900 hidden md:block">
             {TABS.find((t) => t.id === tab).label}
           </h1>
-          <Link to="/" className="focus-ring text-sm font-medium text-ink-500 hover:text-ink-900 transition-colors">
-            Salir a la portada
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link to="/" className="focus-ring text-sm font-medium text-ink-500 hover:text-ink-900 transition-colors">
+              Salir a la portada
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="focus-ring text-sm font-medium text-ink-500 hover:text-coral-600 transition-colors"
+            >
+              Cerrar sesión
+            </button>
+          </div>
         </header>
 
         {/* Mobile tabs */}

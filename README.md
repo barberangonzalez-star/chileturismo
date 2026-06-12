@@ -20,6 +20,20 @@ npm run build
 npm run preview
 ```
 
+## Autenticación (Supabase)
+El registro y login de operadores usan [Supabase Auth](https://supabase.com).
+
+1. Crea un proyecto gratis en supabase.com.
+2. En **Settings → API**, copia el `Project URL` y el `anon public key`.
+3. **Local**: copia `.env.example` a `.env` y completa esos dos valores.
+4. **Vercel**: en el proyecto → Settings → Environment Variables, agrega:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+   y vuelve a desplegar (Redeploy).
+5. Opcional: en Supabase → Authentication → Providers, puedes desactivar
+   "Confirm email" para pruebas rápidas (así no hay que confirmar el correo
+   para iniciar sesión justo después de registrarse).
+
 ## Despliegue en Vercel
 1. Sube este proyecto a un repositorio de GitHub.
 2. En Vercel, "Add New Project" → importa el repo.

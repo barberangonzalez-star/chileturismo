@@ -17,7 +17,7 @@ export default function NavBar() {
         </nav>
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/registro')}
+            onClick={() => navigate('/login')}
             className="focus-ring text-sm font-semibold text-ink-900 hover:text-teal-600 transition-colors hidden sm:inline"
           >
             Iniciar sesión
